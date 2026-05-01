@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brainstorm</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #F4F3F8; color: #1a1a2e; padding: 32px; }
+
+  h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 28px; }
+
+  /* Full mockup wrapper */
+  .mockup-wrapper {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    overflow: hidden;
+    display: flex;
+    height: 540px;
+    border: 1px solid #e5e7eb;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 220px;
+    background: white;
+    border-right: 1px solid #f0eef8;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    padding: 20px 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #f0eef8;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: #7c3aed;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 15px;
+  }
+  .logo-text { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .logo-sub { font-size: 10px; color: #9ca3af; }
+
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 16px 16px 8px;
+  }
+
+  .client-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; display: flex; flex-direction: column; gap: 4px; }
+
+  .client-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .client-item:hover { background: #f5f3ff; }
+  .client-item.active {
+    background: #7c3aed;
+  }
+  .client-item.active .client-name { color: white; font-weight: 600; }
+  .client-item.active .client-sub { color: rgba(255,255,255,0.65); }
+
+  /* Status tint for non-active items */
+  .client-item.status-green { background: rgba(34, 197, 94, 0.08); }
+  .client-item.status-yellow { background: rgba(234, 179, 8, 0.09); }
+  .client-item.status-red { background: rgba(239, 68, 68, 0.08); }
+  .client-item.status-green:hover { background: rgba(34, 197, 94, 0.14); }
+  .client-item.status-yellow:hover { background: rgba(234, 179, 8, 0.15); }
+  .client-item.status-red:hover { background: rgba(239, 68, 68, 0.13); }
+
+  .client-avatar {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .avatar-green { background: rgba(34,197,94,0.15); color: #16a34a; }
+  .avatar-yellow { background: rgba(234,179,8,0.15); color: #b45309; }
+  .avatar-red { background: rgba(239,68,68,0.15); color: #dc2626; }
+  .avatar-active { background: rgba(255,255,255,0.2); color: white; }
+
+  .client-info { flex: 1; min-width: 0; }
+  .client-name { font-size: 12px; font-weight: 500; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .client-sub { font-size: 10px; color: #9ca3af; }
+
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-green { background: #22c55e; }
+  .dot-yellow { background: #eab308; }
+  .dot-red { background: #ef4444; }
+  .dot-white { background: rgba(255,255,255,0.7); }
+
+  /* Config button */
+  .sidebar-footer {
+    padding: 10px 8px 16px;
+    border-top: 1px solid #f0eef8;
+  }
+  .config-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 10px;
+    cursor: pointer; color: #6b7280; font-size: 12px;
+    transition: background 0.15s;
+  }
+  .config-btn:hover { background: #f5f3ff; color: #7c3aed; }
+  .config-icon { font-size: 16px; }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content { flex: 1; background: #F4F3F8; display: flex; flex-direction: column; overflow: hidden; }
+
+  .main-header {
+    background: white;
+    border-bottom: 1px solid #f0eef8;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 56px;
+  }
+
+  .client-header-info { margin-right: auto; }
+  .client-header-name { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .client-header-id { font-size: 11px; color: #9ca3af; }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    margin-right: 16px;
+  }
+  .badge-green { background: #f0fdf4; color: #16a34a; }
+  .badge-yellow { background: #fefce8; color: #a16207; }
+  .badge-red { background: #fef2f2; color: #dc2626; }
+
+  .generate-btn {
+    background: #7c3aed; color: white; border: none;
+    padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0;
+    background: white;
+    border-bottom: 1px solid #f0eef8;
+    padding: 0 28px;
+  }
+  .tab {
+    padding: 12px 20px;
+    font-size: 13px; color: #6b7280; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab.active { color: #7c3aed; border-bottom-color: #7c3aed; font-weight: 600; }
+  .tab:hover:not(.active) { color: #374151; }
+
+  /* Tab content */
+  .tab-content { flex: 1; padding: 24px 28px; overflow-y: auto; }
+
+  /* Task view */
+  .section-group { margin-bottom: 20px; }
+  .section-title {
+    font-size: 11px; font-weight: 600; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: #f0eef8; }
+
+  .task-card {
+    background: white; border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .task-check {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 1.5px solid #d1d5db; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .task-check.done { background: #7c3aed; border-color: #7c3aed; }
+  .task-check.done::after { content: '✓'; color: white; font-size: 9px; font-weight: 700; }
+  .task-name { font-size: 13px; color: #1a1a2e; flex: 1; }
+  .task-name.done { text-decoration: line-through; color: #9ca3af; }
+  .task-assignee { font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 4px; }
+  .task-date { font-size: 11px; color: #6b7280; }
+  .task-date.overdue { color: #ef4444; font-weight: 600; }
+  .mini-avatar {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #ede9fe; color: #7c3aed; font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Brief tab */
+  .brief-card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .brief-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .brief-text { font-size: 13px; color: #374151; line-height: 1.6; }
+  .brief-date { font-size: 11px; color: #9ca3af; margin-top: 12px; }
+
+  /* Report tab */
+  .report-semaphore { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .sem-card {
+    background: white; border-radius: 12px; padding: 16px; text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 2px solid transparent;
+  }
+  .sem-card.active-green { border-color: #22c55e; background: #f0fdf4; }
+  .sem-emoji { font-size: 24px; margin-bottom: 4px; }
+  .sem-label { font-size: 13px; font-weight: 700; }
+  .sem-label.green { color: #16a34a; }
+  .sem-label.yellow { color: #a16207; }
+  .sem-label.red { color: #dc2626; }
+  .sem-desc { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  .report-section { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .report-section-title { font-size: 12px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .deviation-item { font-size: 12px; color: #374151; padding: 6px 0; border-bottom: 1px solid #f9fafb; display: flex; gap: 8px; align-items: flex-start; }
+  .deviation-item:last-child { border-bottom: none; }
+  .dev-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+
+  /* Tab switching */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<h2>Layout híbrido: sidebar de clientes + tabs por cliente</h2>
+<p class="subtitle">Así quedaría la interfaz. Hacé click en los clientes y tabs para explorar la interacción.</p>
+
+<div class="mockup-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">PM Tracker</div>
+        <div class="logo-sub">Avalon World Agency</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Clientes</div>
+
+    <div class="client-list">
+      <div class="client-item active" onclick="selectClient(this, 'green', 'Openn Pilar', 'Último reporte: Verde')">
+        <div class="client-avatar avatar-active">OP</div>
+        <div class="client-info">
+          <div class="client-name">Openn Pilar</div>
+          <div class="client-sub">Último: Verde</div>
+        </div>
+        <div class="status-dot dot-white"></div>
+      </div>
+
+      <div class="client-item status-yellow" onclick="selectClient(this, 'yellow', 'Maserati AR', 'Último reporte: Amarillo')">
+        <div class="client-avatar avatar-yellow">MA</div>
+        <div class="client-info">
+          <div class="client-name">Maserati AR</div>
+          <div class="client-sub">Último: Amarillo</div>
+        </div>
+        <div class="status-dot dot-yellow"></div>
+      </div>
+
+      <div class="client-item status-red" onclick="selectClient(this, 'red', 'Del Sol Auto', 'Último reporte: Rojo')">
+        <div class="client-avatar avatar-red">DS</div>
+        <div class="client-info">
+          <div class="client-name">Del Sol Auto</div>
+          <div class="client-sub">Último: Rojo</div>
+        </div>
+        <div class="status-dot dot-red"></div>
+      </div>
+
+      <div class="client-item status-green" onclick="selectClient(this, 'green', 'Viviera', 'Último reporte: Verde')">
+        <div class="client-avatar avatar-green">VV</div>
+        <div class="client-info">
+          <div class="client-name">Viviera</div>
+          <div class="client-sub">Último: Verde</div>
+        </div>
+        <div class="status-dot dot-green"></div>
+      </div>
+
+      <div class="client-item" onclick="selectClient(this, 'none', 'Grupo Norte', 'Sin reporte')">
+        <div class="client-avatar" style="background:#f3f4f6;color:#6b7280;">GN</div>
+        <div class="client-info">
+          <div class="client-name">Grupo Norte</div>
+          <div class="client-sub">Sin reporte</div>
+        </div>
+        <div class="status-dot" style="background:#d1d5db;"></div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="config-btn">
+        <span class="config-icon">⚙️</span>
+        <span>Configuración</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="main-header">
+      <div class="client-header-info">
+        <div class="client-header-name" id="header-name">Openn Pilar</div>
+        <div class="client-header-id" id="header-sub">ID Asana: 12034982</div>
+      </div>
+      <div class="status-badge badge-green" id="header-badge">🟢 Verde</div>
+      <button class="generate-btn">🔄 Generar Reporte</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this, 'tasks')">📋 Tareas</div>
+      <div class="tab" onclick="switchTab(this, 'brief')">📄 Brief</div>
+      <div class="tab" onclick="switchTab(this, 'report')">📊 Reporte</div>
+    </div>
+
+    <!-- Tab: Tareas -->
+    <div class="tab-content">
+      <div class="tab-panel active" id="tab-tasks">
+        <div class="section-group">
+          <div class="section-title">Alta cliente</div>
+          <div class="task-card">
+            <div class="task-check done"></div>
+            <div class="task-name done">Alta administrativa</div>
+            <div class="task-assignee"><div class="mini-avatar">JF</div> Juan F.</div>
+            <div class="task-date">22 oct 2025</div>
+          </div>
+          <div class="task-card">
+            <div class="task-check done"></div>
+            <div class="task-name done">Cobro al cliente</div>
+            <div class="task-assignee"><div class="mini-avatar">JF</div> Juan F.</div>
+            <div class="task-date">23 oct 2025</div>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="section-title">Onboarding</div>
+          <div class="task-card">
+            <div class="task-check done"></div>
+            <div class="task-name done">Reunión de Brief</div>
+            <div class="task-assignee"><div class="mini-avatar">JF</div> Juan F.</div>
+            <div class="task-date">24–30 oct 2025</div>
+          </div>
+          <div class="task-card">
+            <div class="task-check"></div>
+            <div class="task-name">Desarrollo web-Brief</div>
+            <div class="task-assignee"><div class="mini-avatar">UP</div> Up.</div>
+            <div class="task-date overdue">⚠ Vence 13 nov 2025</div>
+          </div>
+        </div>
+        <div class="section-group">
+          <div class="section-title">Estrategia</div>
+          <div class="task-card">
+            <div class="task-check done"></div>
+            <div class="task-name done">Estrategia de comunicación</div>
+            <div class="task-assignee"><div class="mini-avatar">UP</div> Up.</div>
+            <div class="task-date">31 oct – 5 nov</div>
+          </div>
+          <div class="task-card">
+            <div class="task-check"></div>
+            <div class="task-name">PDP -2 semana</div>
+            <div class="task-assignee" style="color:#ef4444;font-size:11px;">⚠ Sin responsable</div>
+            <div class="task-date">5–10 nov 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-brief">
+        <div class="brief-card">
+          <div class="brief-label">Brief del proyecto</div>
+          <div class="brief-text">
+            El cliente solicita una estrategia integral de contenidos para redes sociales, incluyendo 12 posts mensuales en Instagram y LinkedIn, 4 stories semanales, gestión de community management, 1 reporte mensual de métricas de rendimiento, y coordinación con el equipo de diseño para la producción de piezas gráficas.
+          </div>
+          <div class="brief-date">Cargado el 24 oct 2025 · Fuente: texto manual</div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-report">
+        <div class="report-semaphore">
+          <div class="sem-card active-green">
+            <div class="sem-emoji">🟢</div>
+            <div class="sem-label green">Verde</div>
+            <div class="sem-desc">Ejecución alineada</div>
+          </div>
+          <div class="sem-card">
+            <div class="sem-emoji">🟡</div>
+            <div class="sem-label yellow">Amarillo</div>
+            <div class="sem-desc">Desvíos leves</div>
+          </div>
+          <div class="sem-card">
+            <div class="sem-emoji">🔴</div>
+            <div class="sem-label red">Rojo</div>
+            <div class="sem-desc">Riesgo de incumplimiento</div>
+          </div>
+        </div>
+        <div class="report-section">
+          <div class="report-section-title">⚠️ Desvíos detectados</div>
+          <div class="deviation-item"><div class="dev-dot" style="background:#f59e0b;"></div>Tarea "PDP -2 semana" sin responsable asignado</div>
+          <div class="deviation-item"><div class="dev-dot" style="background:#ef4444;"></div>"Desarrollo web-Brief" vencida — 3 días de atraso</div>
+        </div>
+        <div class="report-section">
+          <div class="report-section-title">💡 Recomendaciones</div>
+          <div class="deviation-item"><div class="dev-dot" style="background:#7c3aed;"></div>Asignar responsable a PDP antes del 15 nov</div>
+          <div class="deviation-item"><div class="dev-dot" style="background:#7c3aed;"></div>Confirmar con el equipo el estado del web-brief</div>
+        </div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:8px;">Generado el 30 abr 2026 · 02:14 hs</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectClient(el, status, name, sub) {
+  document.querySelectorAll('.client-item').forEach(c => {
+    c.classList.remove('active');
+    const av = c.querySelector('.client-avatar');
+    const st = c.dataset.status;
+    if(st === 'green') { av.className = 'client-avatar avatar-green'; }
+    else if(st === 'yellow') { av.className = 'client-avatar avatar-yellow'; }
+    else if(st === 'red') { av.className = 'client-avatar avatar-red'; }
+    else { av.className = 'client-avatar'; av.style.background='#f3f4f6'; av.style.color='#6b7280'; }
+    const dot = c.querySelector('.status-dot');
+    dot.style.background = '';
+  });
+  el.classList.add('active');
+  const av = el.querySelector('.client-avatar');
+  av.className = 'client-avatar avatar-active';
+  document.getElementById('header-name').textContent = name;
+  document.getElementById('header-sub').textContent = sub;
+  const badge = document.getElementById('header-badge');
+  badge.className = 'status-badge';
+  if(status === 'green') { badge.classList.add('badge-green'); badge.textContent = '🟢 Verde'; }
+  else if(status === 'yellow') { badge.classList.add('badge-yellow'); badge.textContent = '🟡 Amarillo'; }
+  else if(status === 'red') { badge.classList.add('badge-red'); badge.textContent = '🔴 Rojo'; }
+  else { badge.style.display='none'; }
+  try {
+    fetch('/__select', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ type:'click', choice: status+'-'+name, text: name+' ('+status+')', timestamp: Date.now() })
+    });
+  } catch(e){}
+}
+
+// Set data-status on items
+document.querySelectorAll('.client-item').forEach(el => {
+  if(el.classList.contains('status-green')) el.dataset.status = 'green';
+  else if(el.classList.contains('status-yellow')) el.dataset.status = 'yellow';
+  else if(el.classList.contains('status-red')) el.dataset.status = 'red';
+});
+
+function switchTab(el, tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brainstorm</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #F4F3F8; color: #1a1a2e; padding: 32px; }
+
+  h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 28px; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .card:hover { border-color: #c4b5fd; box-shadow: 0 4px 16px rgba(124,58,237,0.12); }
+  .card.selected { border-color: #7c3aed; box-shadow: 0 4px 20px rgba(124,58,237,0.2); }
+
+  .card-preview {
+    height: 220px;
+    background: #F4F3F8;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+  }
+
+  /* Sidebar mock */
+  .mock-sidebar {
+    width: 52px;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .mock-sidebar.wide { width: 90px; font-size: 7px; align-items: flex-start; padding: 12px 8px; }
+  .mock-dot { width: 24px; height: 24px; border-radius: 6px; background: #f3f0ff; display: flex; align-items: center; justify-content: center; }
+  .mock-dot.active { background: #7c3aed; }
+  .mock-dot svg { width: 12px; height: 12px; }
+
+  .mock-main { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* Client list */
+  .mock-client-row {
+    display: flex; align-items: center; gap: 8px;
+    background: white; border-radius: 8px; padding: 7px 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-size: 7px; color: #374151;
+  }
+  .mock-client-row.active { border: 1.5px solid #7c3aed; }
+  .mock-avatar { width: 18px; height: 18px; border-radius: 50%; background: #ede9fe; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; color: #7c3aed; }
+  .mock-badge { margin-left: auto; width: 8px; height: 8px; border-radius: 50%; }
+  .mock-badge.green { background: #22c55e; }
+  .mock-badge.yellow { background: #eab308; }
+  .mock-badge.red { background: #ef4444; }
+
+  /* Detail panel */
+  .mock-detail {
+    flex: 1.2; background: white; border-left: 1px solid #e5e7eb; padding: 10px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .mock-detail-title { font-size: 8px; font-weight: 700; color: #1a1a2e; }
+  .mock-section-label { font-size: 6px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .mock-task { background: #f9fafb; border-radius: 4px; padding: 4px 6px; font-size: 6px; color: #374151; display: flex; gap: 4px; align-items: center; }
+  .mock-task .check { width: 8px; height: 8px; border-radius: 2px; border: 1px solid #d1d5db; flex-shrink: 0; }
+  .mock-task .check.done { background: #7c3aed; border-color: #7c3aed; }
+
+  .mock-btn {
+    margin-top: auto; background: #7c3aed; color: white; border-radius: 6px;
+    padding: 5px 10px; font-size: 7px; font-weight: 600; text-align: center;
+  }
+
+  /* Route breadcrumb */
+  .mock-breadcrumb { font-size: 6px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
+  .mock-breadcrumb span { color: #7c3aed; }
+
+  /* Report view */
+  .mock-report { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .mock-semaphore { display: flex; gap: 6px; }
+  .mock-sem-card { flex: 1; background: #f0fdf4; border-radius: 6px; padding: 6px; font-size: 6px; color: #166534; text-align: center; }
+  .mock-sem-card.active { background: #22c55e; color: white; font-weight: 700; }
+  .mock-sem-card.yellow { background: #fefce8; color: #854d0e; }
+  .mock-sem-card.red { background: #fef2f2; color: #991b1b; }
+  .mock-list-item { font-size: 6px; color: #374151; display: flex; gap: 4px; align-items: flex-start; padding: 3px 0; border-bottom: 1px solid #f3f4f6; }
+  .mock-list-bullet { width: 4px; height: 4px; border-radius: 50%; background: #fbbf24; margin-top: 2px; flex-shrink: 0; }
+
+  /* Option B: tabs */
+  .mock-tabs { display: flex; gap: 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 8px; }
+  .mock-tab { font-size: 6px; padding: 4px 8px; color: #9ca3af; }
+  .mock-tab.active { color: #7c3aed; border-bottom: 2px solid #7c3aed; margin-bottom: -1px; }
+
+  /* Option C: full page */
+  .mock-full-header { background: white; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; font-size: 8px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .mock-full-header .back { font-size: 6px; color: #7c3aed; }
+  .mock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .mock-panel { background: white; border-radius: 6px; padding: 8px; font-size: 6px; }
+  .mock-panel-title { font-size: 7px; font-weight: 700; margin-bottom: 4px; color: #374151; }
+  .mock-textarea { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; height: 40px; width: 100%; font-size: 5px; padding: 4px; color: #9ca3af; }
+
+  .card-body { padding: 16px; }
+  .card-body h3 { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .card-body p { font-size: 12px; color: #6b7280; line-height: 1.4; margin-bottom: 8px; }
+  .tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #f3f0ff; color: #7c3aed; font-weight: 600; }
+  .tag.green { background: #f0fdf4; color: #16a34a; }
+  .badge-letter {
+    width: 26px; height: 26px; border-radius: 8px; background: #7c3aed;
+    color: white; font-weight: 800; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .badge-letter.b { background: #0ea5e9; }
+  .badge-letter.c { background: #10b981; }
+
+  .selected-indicator {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #7c3aed; color: white; padding: 10px 24px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; display: none; box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .selected-indicator.visible { display: block; }
+</style>
+</head>
+<body>
+
+<h2>¿Cómo navegás entre clientes y reportes?</h2>
+<p class="subtitle">Las tres opciones respetan el mismo design system. Elegí la que mejor se adapta a tu flujo de trabajo.</p>
+
+<div class="cards">
+
+  <!-- OPTION A -->
+  <div class="card" onclick="select(this, 'A')" data-choice="A">
+    <div class="card-preview">
+      <!-- Sidebar -->
+      <div class="mock-sidebar wide">
+        <div style="font-size:7px;font-weight:700;color:#7c3aed;padding:4px 0 8px;">⚡ PM CRM</div>
+        <div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;width:100%;margin-bottom:4px;">👥 Clientes</div>
+        <div style="color:#9ca3af;padding:3px 6px;">⚙️ Config</div>
+      </div>
+      <!-- Client list + inline detail -->
+      <div class="mock-main">
+        <div style="font-size:8px;font-weight:700;margin-bottom:4px;">Mis Clientes</div>
+        <div class="mock-client-row active">
+          <div class="mock-avatar">O</div>
+          <span>Openn Pilar</span>
+          <div class="mock-badge green"></div>
+        </div>
+        <div class="mock-client-row">
+          <div class="mock-avatar" style="background:#fef3c7;color:#d97706;">M</div>
+          <span>Maserati</span>
+          <div class="mock-badge yellow"></div>
+        </div>
+        <div class="mock-client-row">
+          <div class="mock-avatar" style="background:#fee2e2;color:#dc2626;">D</div>
+          <span>Del Sol</span>
+          <div class="mock-badge red"></div>
+        </div>
+      </div>
+      <!-- Detail panel -->
+      <div class="mock-detail">
+        <div class="mock-breadcrumb">Clientes <span>›</span> <span>Openn Pilar</span></div>
+        <div class="mock-detail-title">Openn Pilar</div>
+        <div class="mock-section-label">Onboarding</div>
+        <div class="mock-task"><div class="check done"></div>Reunión de Brief</div>
+        <div class="mock-task"><div class="check done"></div>Armado Grupo WA</div>
+        <div class="mock-section-label">Estrategia</div>
+        <div class="mock-task"><div class="check"></div>PDP -2 semana</div>
+        <div class="mock-btn">🔄 Generar Reporte</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3><div class="badge-letter">A</div> Split panel — lista + detalle</h3>
+      <p>La lista de clientes siempre visible a la izquierda. Al hacer click, el detalle aparece en un panel derecho sin cambiar de página.</p>
+      <span class="tag">Recomendado</span>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="card" onclick="select(this, 'B')" data-choice="B">
+    <div class="card-preview">
+      <div class="mock-sidebar">
+        <div class="mock-dot active"><svg viewBox="0 0 24 24" fill="white"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></div>
+        <div class="mock-dot"><svg viewBox="0 0 24 24" fill="#9ca3af"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg></div>
+      </div>
+      <div class="mock-main">
+        <!-- Tabs -->
+        <div class="mock-breadcrumb" style="margin-bottom:6px;">/ clientes / openn-pilar</div>
+        <div class="mock-tabs">
+          <div class="mock-tab active">Tareas</div>
+          <div class="mock-tab">Brief</div>
+          <div class="mock-tab">Reporte</div>
+        </div>
+        <div class="mock-section-label">Alta cliente</div>
+        <div class="mock-task"><div class="check done"></div>Alta administrativa</div>
+        <div class="mock-task"><div class="check done"></div>Cobro al cliente</div>
+        <div class="mock-section-label">Onboarding</div>
+        <div class="mock-task"><div class="check done"></div>Reunión de Brief</div>
+        <div class="mock-task"><div class="check"></div>Desarrollo web-Brief</div>
+        <div class="mock-btn" style="margin-top:8px;">🔄 Generar Reporte</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3><div class="badge-letter b">B</div> Páginas + tabs por cliente</h3>
+      <p>Cada cliente tiene su propia URL. Dentro, tabs para navegar entre Tareas, Brief y Reporte. URL limpia, fácil de bookmarkear.</p>
+      <span class="tag" style="background:#e0f2fe;color:#0369a1;">Simple</span>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="card" onclick="select(this, 'C')" data-choice="C">
+    <div class="card-preview" style="flex-direction:column;">
+      <div class="mock-full-header">
+        <span>⟵ <span style="color:#7c3aed;font-size:6px;">Clientes</span> &nbsp;/&nbsp; Openn Pilar</span>
+        <div class="mock-btn" style="margin:0;padding:4px 8px;">🔄 Generar</div>
+      </div>
+      <div style="padding:8px;flex:1;overflow:hidden;">
+        <div class="mock-grid">
+          <div class="mock-panel">
+            <div class="mock-panel-title">📋 Brief del proyecto</div>
+            <div class="mock-textarea">El cliente solicita estrategia de contenidos para RRSS, incluyendo 12 posts mensuales, 4 stories semanales, 1 reporte mensual de métricas...</div>
+          </div>
+          <div class="mock-panel">
+            <div class="mock-panel-title">✅ Estado del reporte</div>
+            <div class="mock-semaphore" style="margin-bottom:6px;">
+              <div class="mock-sem-card active">🟢<br>Verde</div>
+              <div class="mock-sem-card yellow">🟡<br>Amarillo</div>
+              <div class="mock-sem-card red">🔴<br>Rojo</div>
+            </div>
+            <div class="mock-list-item"><div class="mock-list-bullet"></div>Falta responsable en "PDP"</div>
+            <div class="mock-list-item"><div class="mock-list-bullet" style="background:#ef4444;"></div>Tarea vencida hace 3 días</div>
+          </div>
+        </div>
+        <div class="mock-panel" style="margin-top:6px;">
+          <div class="mock-panel-title">📊 Tareas (Asana)</div>
+          <div style="display:flex;gap:6px;overflow:hidden;">
+            <div style="flex:1;"><div class="mock-section-label">Onboarding</div><div class="mock-task"><div class="check done"></div>Reunión Brief</div></div>
+            <div style="flex:1;"><div class="mock-section-label">Estrategia</div><div class="mock-task"><div class="check"></div>PDP -2 semana</div></div>
+            <div style="flex:1;"><div class="mock-section-label">Community</div><div class="mock-task"><div class="check"></div>Completar PDP</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3><div class="badge-letter c">C</div> Todo en una pantalla</h3>
+      <p>Brief + tareas + último reporte en una sola vista por cliente. Máxima densidad de información, sin cambios de tab.</p>
+      <span class="tag green">Todo junto</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="selected-indicator" id="indicator"></div>
+
+<script>
+function select(el, choice) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const indicator = document.getElementById('indicator');
+  const labels = { A: 'A — Split panel', B: 'B — Páginas + tabs', C: 'C — Todo en una pantalla' };
+  indicator.textContent = '✓ Seleccionaste opción ' + labels[choice];
+  indicator.classList.add('visible');
+
+  // Log to state (visual companion protocol)
+  try {
+    fetch('/__select', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ type: 'click', choice, text: labels[choice], timestamp: Date.now() })
+    });
+  } catch(e) {}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm run test*)",
+      "Bash(npm install*)",
+      "Bash(npx *)",
+      "Bash(git *)",
+      "Bash(mkdir *)",
+      "Bash(timeout *)",
+      "Write(C:\\Users\\fabri\\developing\\trabajo\\pm_crm\\*)"
+    ]
+  }
+}
