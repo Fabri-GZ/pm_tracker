@@ -1,0 +1,117 @@
+import type { Client, Brief, SectionWithTasks, Report } from '../types'
+
+type ServerClient = ReturnType<typeof import('./server').createClient>
+type BrowserClient = ReturnType<typeof import('./client').createClient>
+
+export async function getClientsWithStatus(supabase: ServerClient): Promise<Client[]> {
+  const { data: clients, error } = await supabase
+    .from('pm_clients')
+    .select('*')
+    .order('name')
+
+  if (error) throw new Error(error.message)
+
+  const { data: reports } = await supabase
+    .from('pm_reports')
+    .select('client_id, status, generated_at')
+    .order('generated_at', { ascending: false })
+
+  const latestStatus = new Map<string, string>()
+  for (const r of reports ?? []) {
+    if (!latestStatus.has(r.client_id)) {
+      latestStatus.set(r.client_id, r.status)
+    }
+  }
+
+  return clients.map((c) => ({
+    ...c,
+    latest_report_status: (latestStatus.get(c.id) ?? null) as Client['latest_report_status'],
+  }))
+}
+
+export async function getClientById(
+  supabase: ServerClient,
+  id: string
+): Promise<Client | null> {
+  const { data, error } = await supabase
+    .from('pm_clients')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) return null
+  return data as Client
+}
+
+export async function getSectionsWithTasks(
+  supabase: ServerClient,
+  clientId: string
+): Promise<SectionWithTasks[]> {
+  const { data: sections, error: secErr } = await supabase
+    .from('pm_sections')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('order', { ascending: true, nullsFirst: false })
+
+  if (secErr) throw new Error(secErr.message)
+
+  const { data: tasks, error: taskErr } = await supabase
+    .from('pm_tasks')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('due_date', { ascending: true, nullsFirst: false })
+
+  if (taskErr) throw new Error(taskErr.message)
+
+  return (sections ?? []).map((section) => ({
+    ...section,
+    tasks: (tasks ?? []).filter((t) => t.section_id === section.id),
+  }))
+}
+
+export async function getLatestBrief(
+  supabase: ServerClient,
+  clientId: string
+): Promise<Brief | null> {
+  const { data, error } = await supabase
+    .from('pm_briefs')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) return null
+  return data as Brief | null
+}
+
+export async function getLatestReport(
+  supabase: ServerClient,
+  clientId: string
+): Promise<Report | null> {
+  const { data, error } = await supabase
+    .from('pm_reports')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('generated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) return null
+  return data as Report | null
+}
+
+export async function upsertBrief(
+  supabase: BrowserClient,
+  clientId: string,
+  content: string
+): Promise<Brief> {
+  const { data, error } = await supabase
+    .from('pm_briefs')
+    .insert({ client_id: clientId, content, source: 'text' })
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as Brief
+}
