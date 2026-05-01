@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PM Tracker — Delivery Tracker PRO
 
-## Getting Started
+Mini CRM para PMs de Avalon World Agency. Compara el scope prometido al cliente (brief) vs la ejecución real en Asana, y genera reportes automáticos via n8n + IA.
 
-First, run the development server:
+## Stack
+
+- **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS v3
+- **DB**: Supabase / PostgreSQL (read-only desde el front, excepto briefs)
+- **Automatización**: n8n (sync Asana → Supabase + agente IA)
+- **Fuentes**: Unbounded (títulos) + Poppins (cuerpo)
+- **Deploy**: Vercel
+
+## Setup local
+
+1. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+
+2. Crear `.env.local`:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xqvhneikjvefciuhcdgt.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key_de_supabase_dashboard>
+   N8N_WEBHOOK_URL=<url_del_webhook_n8n>
+   ```
+
+3. Correr dev server:
+   ```bash
+   npm run dev
+   ```
+
+## Flujo "Generar Reporte"
+
+1. PM hace click en **Generar Reporte**
+2. `POST /api/generate-report` → llama webhook n8n con `{ client_id, brief_id }`
+3. n8n sincroniza Asana → Supabase (pm_tasks, pm_sections)
+4. n8n corre análisis IA y escribe resultado en `pm_reports`
+5. Front hace `router.refresh()` y muestra el reporte desde Supabase
+
+## Schema Supabase
+
+| Tabla | Propósito |
+|-------|-----------|
+| `pm_clients` | Clientes con su `asana_project_id` |
+| `pm_briefs` | Brief en texto por cliente (único write desde el front) |
+| `pm_sections` | Columnas/secciones del tablero Asana |
+| `pm_tasks` | Tareas con campos custom de Asana |
+| `pm_reports` | Reportes generados (status + desvíos + recomendaciones) |
+| `pm_sync_logs` | Log de sincronizaciones n8n |
+
+## Tests
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run test:run   # run once
+npm run test       # watch mode
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+13 unit tests en `src/lib/__tests__/utils.test.ts` cubriendo `getInitials`, `isOverdue`, `formatDate`, `getStatusColors`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Convenciones
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Fuentes: **Unbounded** para títulos/logos, **Poppins** para el resto
+- Sidebar: 220px fijo, fondo de cliente = color del último reporte (transparente)
+- Sin auth — uso personal de un solo PM
+- El front solo escribe en `pm_briefs` — todo lo demás es read-only
