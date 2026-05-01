@@ -1,6 +1,6 @@
 import type { Client, Brief, SectionWithTasks, Report } from '../types'
 
-type ServerClient = ReturnType<typeof import('./server').createClient>
+type ServerClient = Awaited<ReturnType<typeof import('./server').createClient>>
 type BrowserClient = ReturnType<typeof import('./client').createClient>
 
 export async function getClientsWithStatus(supabase: ServerClient): Promise<Client[]> {

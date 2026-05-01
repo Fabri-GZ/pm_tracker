@@ -19,7 +19,7 @@ type Props = {
 }
 
 export default async function ClientePage({ params, searchParams }: Props) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const [client, latestBrief] = await Promise.all([
     getClientById(supabase, params.id),
     getLatestBrief(supabase, params.id),

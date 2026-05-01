@@ -12,7 +12,7 @@ function SettingsIcon() {
 }
 
 export async function ClientSidebar() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const clients = await getClientsWithStatus(supabase)
 
   return (
