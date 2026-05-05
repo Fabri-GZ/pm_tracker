@@ -20,6 +20,17 @@ export function formatDate(dateStr: string | null): string {
   })
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  green: 'Verde',
+  yellow: 'Amarillo',
+  red: 'Rojo',
+}
+
+export function getStatusLabel(status: string | null | undefined): string {
+  if (!status) return 'Sin reporte'
+  return STATUS_LABELS[status] ?? status
+}
+
 export interface StatusColors {
   bgResting: string
   bgActive: string
@@ -33,7 +44,7 @@ export interface StatusColors {
 
 export function getStatusColors(status: ReportStatus | null | undefined): StatusColors {
   switch (status) {
-    case 'verde':
+    case 'green':
       return {
         bgResting: 'rgba(34, 197, 94, 0.08)',
         bgActive: 'rgba(34, 197, 94, 0.22)',
@@ -44,7 +55,7 @@ export function getStatusColors(status: ReportStatus | null | undefined): Status
         badgeText: 'text-green-700',
         border: '#22c55e',
       }
-    case 'amarillo':
+    case 'yellow':
       return {
         bgResting: 'rgba(234, 179, 8, 0.09)',
         bgActive: 'rgba(234, 179, 8, 0.22)',
@@ -55,7 +66,7 @@ export function getStatusColors(status: ReportStatus | null | undefined): Status
         badgeText: 'text-yellow-700',
         border: '#eab308',
       }
-    case 'rojo':
+    case 'red':
       return {
         bgResting: 'rgba(239, 68, 68, 0.08)',
         bgActive: 'rgba(239, 68, 68, 0.20)',

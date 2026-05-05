@@ -11,22 +11,7 @@ export async function getClientsWithStatus(supabase: ServerClient): Promise<Clie
 
   if (error) throw new Error(error.message)
 
-  const { data: reports } = await supabase
-    .from('pm_reports')
-    .select('client_id, status, generated_at')
-    .order('generated_at', { ascending: false })
-
-  const latestStatus = new Map<string, string>()
-  for (const r of reports ?? []) {
-    if (!latestStatus.has(r.client_id)) {
-      latestStatus.set(r.client_id, r.status)
-    }
-  }
-
-  return clients.map((c) => ({
-    ...c,
-    latest_report_status: (latestStatus.get(c.id) ?? null) as Client['latest_report_status'],
-  }))
+  return clients as Client[]
 }
 
 export async function getClientById(

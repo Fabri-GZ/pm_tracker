@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { getInitials, getStatusColors } from '@/lib/utils'
+import { getInitials, getStatusColors, getStatusLabel } from '@/lib/utils'
 import { StatusDot } from '@/components/ui/StatusDot'
 import type { Client } from '@/lib/types'
 
 export function ClientItem({ client }: { client: Client }) {
   const pathname = usePathname()
   const isActive = pathname.startsWith(`/clientes/${client.id}`)
-  const colors = getStatusColors(client.latest_report_status)
+  const colors = getStatusColors(client.status)
 
   return (
     <Link
@@ -33,12 +33,12 @@ export function ClientItem({ client }: { client: Client }) {
         <p className={`text-xs font-poppins truncate ${isActive ? 'font-semibold' : 'font-medium'} text-text`}>
           {client.name}
         </p>
-        <p className="text-[10px] text-text-muted font-poppins capitalize">
-          {client.latest_report_status ?? 'Sin reporte'}
+        <p className="text-[10px] text-text-muted font-poppins">
+          {getStatusLabel(client.status)}
         </p>
       </div>
 
-      <StatusDot status={client.latest_report_status} />
+      <StatusDot status={client.status} />
     </Link>
   )
 }

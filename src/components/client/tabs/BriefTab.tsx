@@ -30,7 +30,7 @@ export function BriefTab({ clientId, brief }: { clientId: string; brief: Brief |
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="w-full">
       {editing ? (
         <div className="bg-white rounded-card shadow-card p-6 space-y-4">
           <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider font-poppins">

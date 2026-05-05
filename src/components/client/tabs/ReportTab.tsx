@@ -2,12 +2,6 @@ import { SemaphoreCard } from '@/components/ui/SemaphoreCard'
 import { formatDate } from '@/lib/utils'
 import type { Report } from '@/lib/types'
 
-const DEVIATION_DOT: Record<string, string> = {
-  high:   'bg-red-400',
-  medium: 'bg-yellow-400',
-  low:    'bg-purple-400',
-}
-
 export function ReportTab({ report }: { report: Report | null }) {
   if (!report) {
     return (
@@ -29,11 +23,11 @@ export function ReportTab({ report }: { report: Report | null }) {
   }
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="w-full space-y-5">
       <div className="grid grid-cols-3 gap-3">
-        <SemaphoreCard value="verde"    activeStatus={report.status} />
-        <SemaphoreCard value="amarillo" activeStatus={report.status} />
-        <SemaphoreCard value="rojo"     activeStatus={report.status} />
+        <SemaphoreCard value="green"  activeStatus={report.status} />
+        <SemaphoreCard value="yellow" activeStatus={report.status} />
+        <SemaphoreCard value="red"    activeStatus={report.status} />
       </div>
 
       {report.summary && (
@@ -49,8 +43,8 @@ export function ReportTab({ report }: { report: Report | null }) {
           <ul className="space-y-0.5">
             {report.deviations.map((d, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm font-poppins text-text py-2 border-b border-border last:border-0">
-                <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${DEVIATION_DOT[d.severity] ?? 'bg-gray-300'}`} />
-                {d.description}
+                <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-gray-400" />
+                {d}
               </li>
             ))}
           </ul>
@@ -64,7 +58,7 @@ export function ReportTab({ report }: { report: Report | null }) {
             {report.risks.map((r, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm font-poppins text-text py-2 border-b border-border last:border-0">
                 <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-red-300" />
-                {r.description}
+                {r}
               </li>
             ))}
           </ul>
@@ -78,7 +72,7 @@ export function ReportTab({ report }: { report: Report | null }) {
             {report.recommendations.map((rec, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm font-poppins text-text py-2 border-b border-border last:border-0">
                 <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-brand" />
-                {rec.description}
+                {rec}
               </li>
             ))}
           </ul>

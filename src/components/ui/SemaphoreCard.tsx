@@ -2,16 +2,16 @@ import type { ReportStatus } from '@/lib/types'
 import { getStatusColors } from '@/lib/utils'
 
 const CONFIG = {
-  verde:    { label: 'Verde',    desc: 'Ejecución alineada' },
-  amarillo: { label: 'Amarillo', desc: 'Desvíos leves' },
-  rojo:     { label: 'Rojo',     desc: 'Riesgo de incumplimiento' },
+  green:  { label: 'Verde',    desc: 'Ejecución alineada' },
+  yellow: { label: 'Amarillo', desc: 'Desvíos leves' },
+  red:    { label: 'Rojo',     desc: 'Riesgo de incumplimiento' },
 }
 
 export function SemaphoreCard({
   value,
   activeStatus,
 }: {
-  value: 'verde' | 'amarillo' | 'rojo'
+  value: ReportStatus
   activeStatus: ReportStatus | null
 }) {
   const isActive = activeStatus === value

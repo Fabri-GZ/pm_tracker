@@ -17,8 +17,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'PM Tracker — Avalon World Agency',
-  description: 'Delivery tracking CRM for project managers',
+  title: 'Avalon World Agency',
+  description: 'Digital Marketing Agency',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

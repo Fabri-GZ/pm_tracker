@@ -14,30 +14,32 @@ import { BriefTab } from '@/components/client/tabs/BriefTab'
 import { ReportTab } from '@/components/client/tabs/ReportTab'
 
 type Props = {
-  params: { id: string }
-  searchParams: { tab?: string }
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ tab?: string }>
 }
 
 export default async function ClientePage({ params, searchParams }: Props) {
+  const { id } = await params
+  const { tab } = await searchParams
   const supabase = await createClient()
   const [client, latestBrief] = await Promise.all([
-    getClientById(supabase, params.id),
-    getLatestBrief(supabase, params.id),
+    getClientById(supabase, id),
+    getLatestBrief(supabase, id),
   ])
 
   if (!client) notFound()
 
-  const activeTab = searchParams.tab ?? 'tareas'
+  const activeTab = tab ?? 'tareas'
 
   let tabContent: React.ReactNode
 
   if (activeTab === 'tareas') {
-    const sections = await getSectionsWithTasks(supabase, params.id)
+    const sections = await getSectionsWithTasks(supabase, id)
     tabContent = <TasksTab sections={sections} />
   } else if (activeTab === 'brief') {
-    tabContent = <BriefTab clientId={params.id} brief={latestBrief} />
+    tabContent = <BriefTab clientId={id} brief={latestBrief} />
   } else {
-    const report = await getLatestReport(supabase, params.id)
+    const report = await getLatestReport(supabase, id)
     tabContent = <ReportTab report={report} />
   }
 
@@ -45,7 +47,7 @@ export default async function ClientePage({ params, searchParams }: Props) {
     <div className="flex flex-col h-full min-h-screen">
       <ClientHeader client={client} latestBrief={latestBrief} />
       <Suspense>
-        <ClientTabs clientId={params.id} />
+        <ClientTabs clientId={id} />
       </Suspense>
       <div className="flex-1 p-7">
         {tabContent}

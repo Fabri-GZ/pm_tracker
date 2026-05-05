@@ -69,7 +69,7 @@ export function ClientHeader({
         <p className="text-xs text-red-500 font-poppins max-w-xs truncate">{error}</p>
       )}
 
-      <StatusBadge status={client.latest_report_status} />
+      <StatusBadge status={client.status} />
 
       <button
         onClick={handleGenerateReport}

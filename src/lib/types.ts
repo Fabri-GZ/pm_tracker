@@ -1,13 +1,13 @@
 ﻿// src/lib/types.ts
 
-export type ReportStatus = 'verde' | 'amarillo' | 'rojo' | 'pendiente'
+export type ReportStatus = 'green' | 'yellow' | 'red'
 
 export interface Client {
   id: string
   name: string
   asana_project_id: string
+  status: ReportStatus | null
   created_at: string
-  latest_report_status?: ReportStatus | null
 }
 
 export interface Brief {
@@ -49,28 +49,15 @@ export interface SectionWithTasks extends Section {
   tasks: Task[]
 }
 
-export interface ReportDeviation {
-  description: string
-  severity: 'low' | 'medium' | 'high'
-}
-
-export interface ReportRisk {
-  description: string
-}
-
-export interface ReportRecommendation {
-  description: string
-}
-
 export interface Report {
   id: string
   client_id: string
   brief_id: string | null
   status: ReportStatus
   summary: string | null
-  deviations: ReportDeviation[]
-  risks: ReportRisk[]
-  recommendations: ReportRecommendation[]
+  deviations: string[]
+  risks: string[]
+  recommendations: string[]
   raw_response: unknown
   generated_at: string
 }
