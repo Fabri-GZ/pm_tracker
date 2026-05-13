@@ -1,12 +1,13 @@
+import { after } from 'next/server'
 import { ClientSidebar } from '@/components/sidebar/ClientSidebar'
+import { SidebarLayout } from '@/components/layout/SidebarLayout'
+import { triggerSync } from '@/lib/asana/sync'
 
 export default function ClientesLayout({ children }: { children: React.ReactNode }) {
+  after(() => triggerSync())
   return (
-    <div className="flex h-screen overflow-hidden">
-      <ClientSidebar />
-      <main className="flex-1 overflow-y-auto bg-bg">
-        {children}
-      </main>
-    </div>
+    <SidebarLayout sidebar={<ClientSidebar />}>
+      {children}
+    </SidebarLayout>
   )
 }

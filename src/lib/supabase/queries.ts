@@ -1,12 +1,16 @@
 import type { Client, Brief, SectionWithTasks, Report } from '../types'
+import { ASANA_PROJECT_ALLOWLIST } from '../asana/config'
 
 type ServerClient = Awaited<ReturnType<typeof import('./server').createClient>>
 type BrowserClient = ReturnType<typeof import('./client').createClient>
 
 export async function getClientsWithStatus(supabase: ServerClient): Promise<Client[]> {
+  const allowedGids = Object.values(ASANA_PROJECT_ALLOWLIST)
+
   const { data: clients, error } = await supabase
     .from('pm_clients')
     .select('*')
+    .in('asana_project_id', allowedGids)
     .order('name')
 
   if (error) throw new Error(error.message)

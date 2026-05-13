@@ -13,17 +13,17 @@ export function isOverdue(dueDate: string | null, completed: boolean): boolean {
 
 export function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString('es-AR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+  const d = new Date(dateStr)
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const year = d.getUTCFullYear()
+  return `${day}/${month}/${year}`
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  green: 'Verde',
-  yellow: 'Amarillo',
-  red: 'Rojo',
+  green: 'Al día',
+  yellow: 'Atención',
+  red: 'Crítico',
 }
 
 export function getStatusLabel(status: string | null | undefined): string {

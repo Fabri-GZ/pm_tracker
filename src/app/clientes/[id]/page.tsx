@@ -49,7 +49,7 @@ export default async function ClientePage({ params, searchParams }: Props) {
       <Suspense>
         <ClientTabs clientId={id} />
       </Suspense>
-      <div className="flex-1 p-7">
+      <div key={activeTab} className="flex-1 p-7 tab-content-enter">
         {tabContent}
       </div>
     </div>

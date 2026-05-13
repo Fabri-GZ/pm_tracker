@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { getInitials, getStatusColors, getStatusLabel } from '@/lib/utils'
@@ -10,13 +11,20 @@ export function ClientItem({ client }: { client: Client }) {
   const pathname = usePathname()
   const isActive = pathname.startsWith(`/clientes/${client.id}`)
   const colors = getStatusColors(client.status)
+  const [hovered, setHovered] = useState(false)
 
   return (
     <Link
       href={`/clientes/${client.id}`}
-      className="flex items-center gap-2.5 px-2.5 py-2 rounded-item transition-all"
+      className="flex items-center gap-2.5 px-2.5 py-2 rounded-item transition-all duration-200 ease-in"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        backgroundColor: isActive ? colors.bgActive : colors.bgResting,
+        backgroundColor: isActive
+          ? colors.bgActive
+          : hovered
+            ? 'rgba(0,0,0,0.04)'
+            : colors.bgResting,
       }}
     >
       <span
@@ -33,7 +41,7 @@ export function ClientItem({ client }: { client: Client }) {
         <p className={`text-xs font-poppins truncate ${isActive ? 'font-semibold' : 'font-medium'} text-text`}>
           {client.name}
         </p>
-        <p className="text-[10px] text-text-muted font-poppins">
+        <p className="text-xs text-text-muted font-poppins">
           {getStatusLabel(client.status)}
         </p>
       </div>

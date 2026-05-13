@@ -21,7 +21,7 @@ export function ClientTabs({ clientId }: { clientId: string }) {
         <Link
           key={key}
           href={`/clientes/${clientId}?tab=${key}`}
-          className={`px-5 py-3.5 text-sm font-poppins border-b-2 transition-colors -mb-px ${
+          className={`px-5 py-3.5 text-sm font-poppins border-b-2 transition-colors duration-200 ease-in -mb-px ${
             activeTab === key
               ? 'text-brand border-brand font-semibold'
               : 'text-text-muted border-transparent hover:text-text'

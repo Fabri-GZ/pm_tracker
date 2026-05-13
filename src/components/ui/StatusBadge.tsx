@@ -2,9 +2,9 @@ import { getStatusColors } from '@/lib/utils'
 import type { ReportStatus } from '@/lib/types'
 
 const LABELS: Record<string, string> = {
-  green: 'Verde',
-  yellow: 'Amarillo',
-  red: 'Rojo',
+  green: 'Al día',
+  yellow: 'Atención',
+  red: 'Crítico',
 }
 
 export function StatusBadge({ status }: { status: ReportStatus | null | undefined }) {

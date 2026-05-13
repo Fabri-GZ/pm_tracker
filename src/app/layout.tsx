@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Unbounded, Poppins } from 'next/font/google'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 
 const unbounded = Unbounded({
@@ -24,7 +26,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${unbounded.variable} ${poppins.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <ToastContainer position="bottom-right" autoClose={4000} hideProgressBar={false} closeOnClick pauseOnHover theme="light" />
+      </body>
     </html>
   )
 }
