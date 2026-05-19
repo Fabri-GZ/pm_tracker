@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Unbounded, Poppins } from 'next/font/google'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, Slide } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 
@@ -28,7 +28,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={`${unbounded.variable} ${poppins.variable}`}>
       <body className="antialiased">
         {children}
-        <ToastContainer position="bottom-right" autoClose={4000} hideProgressBar={false} closeOnClick pauseOnHover theme="light" />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover={false}
+          theme="colored"
+          transition={Slide}
+        />
       </body>
     </html>
   )

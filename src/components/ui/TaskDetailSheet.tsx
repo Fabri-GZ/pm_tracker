@@ -40,7 +40,7 @@ export function TaskDetailSheet({ task, sectionName, onClose }: Props) {
       onClick={handleClose}
     >
       <div
-        className={`fixed bottom-0 inset-x-0 bg-white rounded-t-2xl max-h-[92vh] overflow-y-auto
+        className={`fixed bottom-0 inset-x-0 bg-white rounded-t-2xl max-h-[92vh] overflow-y-auto overflow-x-hidden
           sm:relative sm:bottom-auto sm:inset-x-auto sm:rounded-xl sm:w-full sm:max-w-[480px] sm:max-h-[85vh]
           ${isClosing
             ? 'animate-sheet-down sm:animate-sheet-fade-out'
@@ -140,8 +140,8 @@ export function TaskDetailSheet({ task, sectionName, onClose }: Props) {
               <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider font-poppins">
                 Notas
               </p>
-              <p className="text-sm font-poppins text-text leading-relaxed whitespace-pre-wrap">
-                {task.notes}
+              <p className="text-sm font-poppins text-text leading-relaxed whitespace-pre-wrap break-words">
+                {renderNotes(task.notes)}
               </p>
             </div>
           )}
@@ -149,6 +149,20 @@ export function TaskDetailSheet({ task, sectionName, onClose }: Props) {
       </div>
     </div>,
     document.body
+  )
+}
+
+function renderNotes(text: string) {
+  return text.split(/(https?:\/\/[^\s]+)/).map((part, i) =>
+    part.startsWith('http') ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer"
+        className="text-brand underline decoration-brand/40 hover:decoration-brand transition-colors"
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    )
   )
 }
 
@@ -175,7 +189,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
       <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider font-poppins w-[72px] flex-shrink-0 pt-[3px] leading-tight">
         {label}
       </span>
-      <div className="flex-1 text-sm font-poppins text-text">
+      <div className="flex-1 min-w-0 text-sm font-poppins text-text break-words">
         {children}
       </div>
     </div>

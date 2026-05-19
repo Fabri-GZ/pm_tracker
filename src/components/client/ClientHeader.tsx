@@ -18,12 +18,11 @@ function SyncIcon({ spinning }: { spinning: boolean }) {
   )
 }
 
-function ReportIcon({ spinning }: { spinning: boolean }) {
+function ReportIcon() {
   return (
     <svg
       width="14" height="14" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-      className={spinning ? 'animate-spin' : ''}
     >
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
       <polyline points="14 2 14 8 20 8"/>
@@ -61,6 +60,10 @@ export function ClientHeader({
   }
 
   async function handleGenerateReport() {
+    if (!latestBrief) {
+      toast.error('No se puede generar un reporte sin brief')
+      return
+    }
     setLoadingReport(true)
     try {
       const res = await fetch('/api/generate-report', {
@@ -110,7 +113,7 @@ export function ClientHeader({
         title={loadingReport ? 'Generando...' : 'Generar Reporte'}
         className="flex items-center gap-1.5 bg-brand hover:bg-brand-hover text-white text-xs font-semibold font-poppins p-2 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 ease-in disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0"
       >
-        <ReportIcon spinning={loadingReport} />
+        <ReportIcon />
         {loadingReport ? 'Generando...' : <><span className="sm:hidden">Generar</span><span className="hidden sm:inline">Generar Reporte</span></>}
       </button>
     </div>
